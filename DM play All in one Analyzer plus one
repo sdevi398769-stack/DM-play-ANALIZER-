@@ -1,1 +1,132 @@
+DM-play-ANALIZER-
+Repository navigation
+Code
+Issues
+Pull requests
+DM-play-ANALIZER-
+/DM_Play_All_in_One_Analyzer_Plus.html
+sdevi398769-stack
+sdevi398769-stack
+5 hours ago
+113 lines (110 loc) · 12 KB
+
+Code
+
+Blame
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101827">
+<title>DM Play All-in-One Analyzer Plus</title>
+<style>
+:root{--bg:#0b1220;--panel:#151f31;--panel2:#0f1929;--text:#f5f7fb;--muted:#9fb0c8;--line:#2b3a50;--blue:#3b82f6}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:820px;margin:auto;padding:15px 13px 38px}.hero{padding:20px 17px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(135deg,#1e3a5f,#182235)}
+h1{font-size:23px;margin:0 0 5px}.muted{color:var(--muted);font-size:13px;line-height:1.5}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:15px;margin-top:13px}
+h2{font-size:18px;margin:0 0 9px}label{display:block;color:#d9e4f4;font-size:14px;margin:11px 0 6px}
+input,select,textarea,button{width:100%;border-radius:11px;border:1px solid #3b4a62;background:#0e1727;color:var(--text);padding:12px;font:inherit}
+textarea{min-height:88px;resize:vertical}button{background:#2563eb;border:0;font-weight:700;margin-top:10px;cursor:pointer}
+button.alt{background:#29384e}button.warn{background:#7f1d1d}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pills{display:flex;flex-wrap:wrap;gap:7px;margin:9px 0}.pill{padding:6px 10px;border-radius:999px;background:#24334a;font-size:12px}
+.result{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:12px}.stat{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:11px}
+.stat span{color:var(--muted);font-size:12px}.stat b{display:block;font-size:22px;margin-top:3px}
+.red{color:#fb7185}.green{color:#4ade80}.violet{color:#c4b5fd}.amber{color:#fbbf24}
+.notice{border-left:3px solid #f59e0b;padding:10px 11px;background:#2b2518;color:#f8e7bd;border-radius:8px;font-size:13px;line-height:1.5;margin-top:12px}
+table{width:100%;border-collapse:collapse;margin-top:9px;font-size:13px}td,th{padding:8px 5px;border-bottom:1px solid var(--line);text-align:left}th{color:var(--muted)}
+.barrow{display:grid;grid-template-columns:28px 1fr 38px;gap:8px;align-items:center;margin:8px 0;font-size:13px}.bar{height:9px;background:#26364d;border-radius:99px;overflow:hidden}.fill{height:100%;background:#60a5fa}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.small{font-size:12px}.hide{display:none}
+footer{text-align:center;color:var(--muted);font-size:12px;margin:18px 0}
+@media(max-width:420px){.grid{grid-template-columns:1fr}.result{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body><main>
+<section class="hero">
+<h1>DM Play – All-in-One Analyzer Plus</h1>
+<div class="muted">मोबाइल के लिए ऑफलाइन हिस्ट्री, कलर और नंबर एनालाइज़र</div>
+<div class="pills"><span class="pill">WinGo</span><span class="pill">K3</span><span class="pill">5D</span><span class="pill">Big / Small</span><span class="pill">Red / Green / Violet</span></div>
+</section>
+
+<section class="card">
+<h2>1. गेम और हिस्ट्री डालें</h2>
+<div class="grid">
+ <div><label for="game">गेम चुनें</label><select id="game"><option>WinGo 1 Minute</option><option>WinGo 30 Seconds</option><option>WinGo 3 Minutes</option><option>WinGo 5 Minutes</option><option>K3</option><option>5D</option><option>अन्य नंबर गेम</option></select></div>
+ <div><label for="period">पीरियड / राउंड (वैकल्पिक)</label><input id="period" placeholder="राउंड नंबर"></div>
+</div>
+<label for="history">पुराने रिज़ल्ट के नंबर</label>
+<textarea id="history" placeholder="उदाहरण: 3, 8, 1, 6, 0, 9, 2, 5"></textarea>
+<div class="muted">कॉमा या स्पेस से अलग करें। WinGo के लिए 0–9 के अंक डालें। K3/5D के लिए भी फिलहाल हर अंक को अलग-अलग गिना जाएगा।</div>
+<div class="actions"><button id="analyze">Analyze करें</button><button class="alt" id="demo">डेमो डेटा भरें</button></div>
+<div id="output" aria-live="polite"></div>
+</section>
+
+<section class="card">
+<h2>2. नए फीचर</h2>
+<div class="grid">
+ <div class="stat"><span>हिस्ट्री सेव</span><b style="font-size:16px">इस डिवाइस पर</b><div class="muted">विश्लेषण के बाद डेटा सेव होगा</div></div>
+ <div class="stat"><span>CSV रिपोर्ट</span><b style="font-size:16px">डाउनलोड</b><div class="muted">अपनी हिस्ट्री एक्सपोर्ट करें</div></div>
+ <div class="stat"><span>कलर अनुपात</span><b style="font-size:16px">Red / Green / Violet</b><div class="muted">पुराने अंकों के आधार पर</div></div>
+ <div class="stat"><span>ट्रेंड रिपोर्ट</span><b style="font-size:16px">Streak / Odd-Even</b><div class="muted">लगातार पैटर्न और अनुपात</div></div>
+</div>
+<div class="actions"><button class="alt" id="export">CSV डाउनलोड</button><button class="warn" id="erase">सेव हिस्ट्री मिटाएँ</button></div>
+<div id="saved" class="muted" style="margin-top:8px"></div>
+</section>
+
+<section class="card">
+<h2>3. कलर और नंबर नियम</h2>
+<div class="pills"><span class="pill green">Green: 1, 3, 7, 9</span><span class="pill red">Red: 2, 4, 6, 8</span><span class="pill violet">Violet: 0, 5</span></div>
+<div class="muted">कई WinGo प्लेटफॉर्म पर 0 को Red+Violet और 5 को Green+Violet भी दिखाया जाता है। आपके गेम के नियम अलग हो सकते हैं; ऐप के आधिकारिक नियम जाँचें।</div>
+<div class="notice">यह टूल केवल आपके डाले हुए पुराने डेटा का हिसाब लगाता है। यह DM Play के सर्वर से जुड़ा नहीं है, न ही अगला नंबर, पक्का रंग या Sure Shot जीत बता सकता है।</div>
+</section>
+<footer>स्वतंत्र ऑफलाइन टूल • DM Play का आधिकारिक ऐप नहीं • कोई लॉगिन या OTP नहीं</footer>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+let lastNums=[];
+function colorTags(n){if(n===0)return ["Red","Violet"];if(n===5)return ["Green","Violet"];if([1,3,7,9].includes(n))return ["Green"];if([2,4,6,8].includes(n))return ["Red"];return ["Unknown"];}
+function pct(x,total){return total?(x/total*100).toFixed(1)+"%":"0%";}
+function analyze(){
+ const raw=$("history").value.trim(), parts=raw.split(/[,\s]+/).filter(Boolean), nums=parts.map(x=>Number(x));
+ const out=$("output");
+ if(nums.length<5||nums.some(n=>!Number.isInteger(n)||n<0||n>9)){out.innerHTML='<p class="notice">कृपया 0 से 9 तक के कम-से-कम 5 सही अंक डालें।</p>';return;}
+ lastNums=nums.slice();
+ const counts=Array(10).fill(0);nums.forEach(n=>counts[n]++);
+ const sorted=counts.map((c,n)=>({n,c})).sort((a,b)=>b.c-a.c);
+ const big=nums.filter(n=>n>=5).length,small=nums.length-big,odd=nums.filter(n=>n%2).length,even=nums.length-odd;
+ const colors={Red:0,Green:0,Violet:0};nums.forEach(n=>colorTags(n).forEach(c=>{if(colors[c]!==undefined)colors[c]++;}));
+ let streak=1;for(let i=nums.length-1;i>0;i--){if(nums[i]===nums[i-1])streak++;else break;}
+ const recent=nums.slice(-10).reverse().map(n=>`<span class="pill">${n} <small class="${colorTags(n)[0].toLowerCase()}">${colorTags(n).join("+")}</small></span>`).join("");
+ const bars=counts.map((c,n)=>`<div class="barrow"><b>${n}</b><div class="bar"><div class="fill" style="width:${c/nums.length*100}%"></div></div><span>${c}</span></div>`).join("");
+ const rows=sorted.map(x=>`<tr><td>${x.n}</td><td>${x.c}</td><td>${pct(x.c,nums.length)}</td></tr>`).join("");
+ out.innerHTML=`<h3 style="font-size:17px;margin:17px 0 7px">रिपोर्ट: ${$("game").value}</h3>
+ <div class="result">
+ <div class="stat"><span>कुल अंक</span><b>${nums.length}</b></div>
+ <div class="stat"><span>सबसे अधिक आया अंक</span><b>${sorted[0].n}</b></div>
+ <div class="stat"><span>Big (5–9)</span><b>${big} <small class="small muted">${pct(big,nums.length)}</small></b></div>
+ <div class="stat"><span>Small (0–4)</span><b>${small} <small class="small muted">${pct(small,nums.length)}</small></b></div>
+ <div class="stat"><span>Odd</span><b>${odd} <small class="small muted">${pct(odd,nums.length)}</small></b></div>
+ <div class="stat"><span>Even</span><b>${even} <small class="small muted">${pct(even,nums.length)}</small></b></div>
+ <div class="stat"><span>Red count*</span><b class="red">${colors.Red}</b></div>
+ <div class="stat"><span>Green count*</span><b class="green">${colors.Green}</b></div>
+ <div class="stat"><span>Violet count*</span><b class="violet">${colors.Violet}</b></div>
+ <div class="stat"><span>आखिरी अंक की लगातार श्रृंखला</span><b>${streak}</b></div></div>
+ <h4 style="margin:17px 0 5px">अंक का बार चार्ट</h4>${bars}
+ <h4 style="margin:17px 0 5px">आखिरी 10 एंट्री (नए से पुराने)</h4><div class="pills">${recent}</div>
+ <h4 style="margin:17px 0 5px">अंक की पूरी गिनती</h4><table><thead><tr><th>अंक</th><th>गिनती</th><th>हिस्सा</th></tr></thead><tbody>${rows}</tbody></table>
+ <p class="muted">* 0 और 5 कुछ गेम नियमों में दो रंगों में गिने जाते हैं, इसलिए रंगों की कुल गिनती कुल राउंड से अधिक हो सकती है।</p>
+ <p class="notice">यह केवल ऐतिहासिक आँकड़ा है, भविष्यवाणी नहीं। अधिक बार आया अंक अगली बार आने की गारंटी नहीं देता।</p>`;
+ const record={game:$("game").value,period:$("period").value,nums:nums,date:new Date().toLocaleString()};
+ try{localStorage.setItem("dmplay_analyzer_latest",JSON.stringify(record));$("saved").textContent="आखिरी रिपोर्ट इस ब्राउज़र में सेव हुई: "+record.date;}catch(e){$("saved").textContent="इस ब्राउज़र में सेव सुविधा उपलब्ध नहीं है।"}
+}
+$("analyze").addEventListener("click",analyze);
+$("demo").addEventListener("click",()=>{$("history").value="3, 8, 1, 6, 0, 9, 2, 5, 7, 4, 3, 1, 8, 0, 5, 9, 2, 6, 7, 3";$("period").value="DEMO";});
+$("export").addEventListener("click",()=>{if(!lastNums.length){alert("पहले हिस्ट्री का विश्लेषण करें।");return;}let csv="Game,Period,Index,Number,Colors\\n"+lastNums.map((n,i)=>`"${$("game").value}","${$("period").value}",${i+1},${n},"${colorTags(n).join("+")}"`).join("\\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="dm-play-history.csv";a.click();URL.revokeObjectURL(a.href);});
+$("erase").addEventListener("click",()=>{try{localStorage.removeItem("dmplay_analyzer_latest");$("saved").textContent="इस ब्राउज़र में सेव रिपोर्ट मिटा दी गई।";}catch(e){$("saved").textContent="सेव डेटा हटाया नहीं जा सका।"}});
+try{const r=JSON.parse(localStorage.getItem("dmplay_analyzer_latest")||"null");if(r)$("saved").textContent="पिछली रिपोर्ट सेव है: "+r.date;}catch(e){}
+</script></body></html>
+Edit file...
+Open with...
+Raw file content
 
