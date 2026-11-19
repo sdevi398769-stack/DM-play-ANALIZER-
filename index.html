@@ -3,12 +3,300 @@
 <html lang="hi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DM Play Analyzer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DM Play Analyzer Plus</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;padding:15px;
+ background:#101827;color:white;
+ font-family:Arial,sans-serif
+}
+.container{max-width:520px;margin:auto}
+h2{text-align:center;color:#35e6a0}
+.card{
+ background:#1e293b;padding:16px;
+ border-radius:14px;margin:13px 0;
+ border:1px solid #334155
+}
+label{display:block;margin:12px 0 6px}
+input{
+ width:100%;padding:14px;
+ border:0;border-radius:9px;
+ font-size:18px;background:#fff;color:#111
+}
+button{
+ width:100%;padding:13px;
+ border:0;border-radius:9px;
+ margin-top:10px;font-size:16px;
+ font-weight:bold;background:#20d69a;
+ color:#102030
+}
+button.secondary{background:#475569;color:white}
+.result{
+ font-size:45px;text-align:center;
+ color:#35e6a0;font-weight:bold
+}
+.small{font-size:13px;color:#cbd5e1}
+.grid{
+ display:grid;grid-template-columns:repeat(2,1fr);
+ gap:10px
+}
+.stat{
+ background:#334155;padding:13px;
+ border-radius:10px;text-align:center
+}
+.stat b{display:block;font-size:23px;color:#35e6a0}
+table{width:100%;border-collapse:collapse}
+td,th{padding:9px;border-bottom:1px solid #475569;text-align:center}
+.green{color:#35e6a0}
+.red{color:#ff7777}
+.violet{color:#d6a0ff}
+</style>
 </head>
 <body>
+<div class="container">
+
+<h2>🎯 DM PLAY ANALYZER PLUS</h2>
+<p style="text-align:center" class="small">
+मोबाइल ऑफलाइन नंबर और ट्रेंड एनालाइज़र
+</p>
+
+<div class="card">
+<h3>1. नया रिज़ल्ट डालें</h3>
+
+<label>पीरियड नंबर</label>
+<input id="period" type="number" placeholder="जैसे 10773">
+
+<label>WinGo रिज़ल्ट नंबर (0 से 9)</label>
+<input id="number" type="number" min="0" max="9"
+placeholder="जैसे 5">
+
+<button onclick="addResult()">विश्लेषण करें</button>
+<p class="small">एक बार में एक रिज़ल्ट डालें।</p>
+</div>
+
+<div class="card">
+<h3>2. आपका रिज़ल्ट</h3>
+<div class="result" id="answer">--</div>
+<div style="text-align:center" id="details">
+पीरियड और नंबर डालें
+</div>
+</div>
+
+<div class="card">
+<h3>3. कुल विश्लेषण</h3>
+<div class="grid">
+<div class="stat">कुल रिज़ल्ट<b id="total">0</b></div>
+<div class="stat">सबसे नया नंबर<b id="latest">--</b></div>
+<div class="stat">सबसे ज्यादा अंक<b id="top">--</b></div>
+<div class="stat">कुल अंकों की गिनती<b id="digits">0</b></div>
+</div>
+</div>
+
+<div class="card">
+<h3>4. नंबर की गिनती</h3>
+<div id="counts" class="grid"></div>
+</div>
+
+<div class="card">
+<h3>5. रंग और ट्रेंड की हिस्ट्री</h3>
+<div id="history"></div>
+</div>
+
+<div class="card">
+<button class="secondary" onclick="downloadCSV()">
+CSV हिस्ट्री डाउनलोड करें
+</button>
+<button class="secondary" onclick="undoLast()">
+आखिरी रिज़ल्ट हटाएँ
+</button>
+<button class="secondary" onclick="clearAll()">
+पूरी हिस्ट्री साफ करें
+</button>
+</div>
+
+<p class="small" style="text-align:center">
+आपका डेटा फोन में सेव रहता है। यह ऐप ऑफलाइन चलता है।
+विश्लेषण पुराने रिज़ल्ट की गिनती है, भविष्य का पक्का नंबर नहीं।
+</p>
+
+</div>
+
 <script>
-window.location.replace("./DM_Play_All_in_One_Analyzer_Plus.html");
+let historyData = [];
+
+try {
+ historyData = JSON.parse(
+ localStorage.getItem("dmplay_history") || "[]"
+ );
+ if(!Array.isArray(historyData)) historyData=[];
+} catch(e) {
+ historyData=[];
+}
+
+function colorOf(n){
+ if(n===0) return "Red + Violet";
+ if(n===5) return "Green + Violet";
+ if([1,3,7,9].includes(n)) return "Green";
+ return "Red";
+}
+
+function groupOf(n){
+ let size=n>=5?"Big":"Small";
+ let odd=n%2===0?"Even":"Odd";
+ return size+" · "+odd+" · "+colorOf(n);
+}
+
+function addResult(){
+ let p=document.getElementById("period").value.trim();
+ let v=document.getElementById("number").value.trim();
+
+ if(p===""){
+  alert("कृपया पीरियड नंबर डालें");
+  return;
+ }
+
+ if(v==="" || !/^[0-9]$/.test(v)){
+  alert("कृपया 0 से 9 के बीच एक नंबर डालें");
+  return;
+ }
+
+ let n=Number(v);
+
+ if(historyData.some(x=>x.period===p)){
+  if(!confirm("यह पीरियड पहले से मौजूद है। फिर भी जोड़ें?"))
+   return;
+ }
+
+ historyData.unshift({
+  period:p,
+  number:n,
+  time:new Date().toLocaleString("hi-IN")
+ });
+
+ save();
+ document.getElementById("number").value="";
+ document.getElementById("number").focus();
+}
+
+function save(){
+ localStorage.setItem(
+  "dmplay_history",JSON.stringify(historyData)
+ );
+ render();
+}
+
+function render(){
+ let total=historyData.length;
+ let counts=Array(10).fill(0);
+
+ historyData.forEach(x=>counts[x.number]++);
+
+ document.getElementById("total").textContent=total;
+ document.getElementById("digits").textContent=total;
+
+ document.getElementById("latest").textContent=
+  total?historyData[0].number:"--";
+
+ let max=Math.max(...counts);
+ let top=total?counts.indexOf(max):"--";
+ document.getElementById("top").textContent=
+  total?top+" ("+max+" बार)":"--";
+
+ let countHTML="";
+ counts.forEach((c,n)=>{
+  countHTML+=`
+   <div class="stat">
+    ${n}<b>${c} बार</b>
+   </div>`;
+ });
+ document.getElementById("counts").innerHTML=countHTML;
+
+ let h=document.getElementById("history");
+
+ if(total===0){
+  h.innerHTML="अभी कोई रिज़ल्ट सेव नहीं है।";
+  document.getElementById("answer").textContent="--";
+  document.getElementById("details").textContent=
+   "पीरियड और नंबर डालें";
+  return;
+ }
+
+ let latest=historyData[0];
+ document.getElementById("answer").textContent=
+  latest.number;
+
+ document.getElementById("details").innerHTML=
+  "पीरियड: "+latest.period+
+  "<br>"+groupOf(latest.number);
+
+ let html=`
+ <table>
+ <tr><th>पीरियड</th><th>नंबर</th><th>विश्लेषण</th></tr>`;
+
+ historyData.slice(0,50).forEach(x=>{
+  html+=`
+  <tr>
+  <td>${escapeHTML(x.period)}</td>
+  <td><b>${x.number}</b></td>
+  <td>${groupOf(x.number)}</td>
+  </tr>`;
+ });
+
+ html+="</table>";
+ h.innerHTML=html;
+}
+
+function escapeHTML(s){
+ return String(s).replace(/[&<>"']/g,c=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",
+  '"':"&quot;","'":"&#39;"
+ }[c]));
+}
+
+function undoLast(){
+ if(!historyData.length){
+  alert("हिस्ट्री खाली है");
+  return;
+ }
+ historyData.shift();
+ save();
+}
+
+function clearAll(){
+ if(confirm("क्या आप पूरी हिस्ट्री हटाना चाहते हैं?")){
+  historyData=[];
+  save();
+ }
+}
+
+function downloadCSV(){
+ if(!historyData.length){
+  alert("डाउनलोड करने के लिए हिस्ट्री नहीं है");
+  return;
+ }
+
+ let rows=[["Period","Number","Analysis"]];
+ historyData.forEach(x=>{
+  rows.push([x.period,x.number,groupOf(x.number)]);
+ });
+
+ let csv="\uFEFF"+rows.map(r=>
+  r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(",")
+ ).join("\n");
+
+ let blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
+ let url=URL.createObjectURL(blob);
+ let a=document.createElement("a");
+ a.href=url;
+ a.download="DM-Play-History.csv";
+ a.click();
+ URL.revokeObjectURL(url);
+}
+
+render();
 </script>
 </body>
 </html>
+
